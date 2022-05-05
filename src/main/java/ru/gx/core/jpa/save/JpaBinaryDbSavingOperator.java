@@ -13,14 +13,14 @@ import ru.gx.core.jpa.ActiveSessionsContainer;
 import java.sql.SQLException;
 
 @Accessors(chain = true)
-public class JdbcBinaryDbSavingOperator
+public class JpaBinaryDbSavingOperator
         extends AbstractBinaryDbSavingOperator {
 
     @Getter(AccessLevel.PROTECTED)
     @NotNull
     private final ActiveSessionsContainer activeSessionsContainer;
 
-    public JdbcBinaryDbSavingOperator(
+    public JpaBinaryDbSavingOperator(
             @NotNull final ObjectMapper objectMapper,
             @NotNull final ActiveSessionsContainer activeSessionsContainer
     ) {

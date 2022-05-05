@@ -12,14 +12,14 @@ import ru.gx.core.jpa.ActiveSessionsContainer;
 import java.sql.SQLException;
 
 @Accessors(chain = true)
-public class JdbcJsonDbSavingOperator
+public class JpaJsonDbSavingOperator
         extends AbstractJsonDbSavingOperator {
 
     @Getter
     @NotNull
     private final ActiveSessionsContainer activeSessionsContainer;
 
-    public JdbcJsonDbSavingOperator(
+    public JpaJsonDbSavingOperator(
             @NotNull final ObjectMapper objectMapper,
             @NotNull final ActiveSessionsContainer activeSessionsContainer
     ) {
