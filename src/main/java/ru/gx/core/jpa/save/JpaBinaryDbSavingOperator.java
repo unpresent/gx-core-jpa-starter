@@ -8,7 +8,7 @@ import org.hibernate.procedure.ProcedureCall;
 import org.jetbrains.annotations.NotNull;
 import ru.gx.core.data.save.AbstractBinaryDbSavingOperator;
 import ru.gx.core.data.save.DbSavingAccumulateMode;
-import ru.gx.core.jpa.ActiveSessionsContainer;
+import ru.gx.core.jpa.sqlwrapping.JpaThreadConnectionsWrapper;
 
 import java.sql.SQLException;
 
@@ -18,14 +18,14 @@ public class JpaBinaryDbSavingOperator
 
     @Getter(AccessLevel.PROTECTED)
     @NotNull
-    private final ActiveSessionsContainer activeSessionsContainer;
+    private final JpaThreadConnectionsWrapper threadConnectionsWrapper;
 
     public JpaBinaryDbSavingOperator(
             @NotNull final ObjectMapper objectMapper,
-            @NotNull final ActiveSessionsContainer activeSessionsContainer
+            @NotNull final JpaThreadConnectionsWrapper threadConnectionsWrapper
     ) {
         super(objectMapper);
-        this.activeSessionsContainer = activeSessionsContainer;
+        this.threadConnectionsWrapper = threadConnectionsWrapper;
     }
 
     @Override
@@ -33,10 +33,7 @@ public class JpaBinaryDbSavingOperator
             @NotNull final String sqlCommand,
             @NotNull final DbSavingAccumulateMode accumulateMode
     ) throws SQLException {
-        var session = getActiveSessionsContainer().getCurrent();
-        if (session == null) {
-            throw new SQLException("Session isn't registered in ActiveConnectionsContainer");
-        }
+        var session = getThreadConnectionsWrapper().getCurrent();
         return session.getNamedProcedureCall(sqlCommand);
     }
 

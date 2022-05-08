@@ -7,7 +7,7 @@ import org.hibernate.procedure.ProcedureCall;
 import org.jetbrains.annotations.NotNull;
 import ru.gx.core.data.save.AbstractJsonDbSavingOperator;
 import ru.gx.core.data.save.DbSavingAccumulateMode;
-import ru.gx.core.jpa.ActiveSessionsContainer;
+import ru.gx.core.jpa.sqlwrapping.JpaThreadConnectionsWrapper;
 
 import java.sql.SQLException;
 
@@ -17,14 +17,14 @@ public class JpaJsonDbSavingOperator
 
     @Getter
     @NotNull
-    private final ActiveSessionsContainer activeSessionsContainer;
+    private final JpaThreadConnectionsWrapper threadConnectionsWrapper;
 
     public JpaJsonDbSavingOperator(
             @NotNull final ObjectMapper objectMapper,
-            @NotNull final ActiveSessionsContainer activeSessionsContainer
+            @NotNull final JpaThreadConnectionsWrapper threadConnectionsWrapper
     ) {
         super(objectMapper);
-        this.activeSessionsContainer = activeSessionsContainer;
+        this.threadConnectionsWrapper = threadConnectionsWrapper;
     }
 
     @Override
@@ -32,11 +32,8 @@ public class JpaJsonDbSavingOperator
             @NotNull final String sqlCommand,
             @NotNull final DbSavingAccumulateMode accumulateMode
     ) throws SQLException {
-        var session = getActiveSessionsContainer().getCurrent();
-        if (session == null) {
-            throw new SQLException("Sessoin isn't registered in ActiveSessionsContainer");
-        }
-        return session.getNamedProcedureCall(sqlCommand);
+        var session = getThreadConnectionsWrapper().getCurrent();
+        return session.createStoredProcedureCall(sqlCommand);
     }
 
     @Override
