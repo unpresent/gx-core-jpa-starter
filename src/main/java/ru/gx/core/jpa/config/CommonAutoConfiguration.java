@@ -59,9 +59,7 @@ public class CommonAutoConfiguration {
             value = "service.db-saving.jpa-saver.enabled",
             havingValue = "true"
     )
-    public JpaDbSaver jdbcDbSaver(
-            @NotNull final DbSavingOperator dbSavingOperator
-    ) {
-        return new JpaDbSaver(dbSavingOperator);
+    public JpaDbSaver jdbcDbSaver() {
+        return new JpaDbSaver();
     }
 }
