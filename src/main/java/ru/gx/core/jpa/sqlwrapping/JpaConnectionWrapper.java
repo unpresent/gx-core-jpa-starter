@@ -2,20 +2,21 @@ package ru.gx.core.jpa.sqlwrapping;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import ru.gx.core.data.sqlwrapping.ConnectionWrapper;
 import ru.gx.core.data.sqlwrapping.SqlCommandWrapper;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-
 public class JpaConnectionWrapper implements ConnectionWrapper {
     @Getter(AccessLevel.PROTECTED)
     @NotNull
     private final Session session;
+
+    /**
+     * Определяет количество использований данного объекта.
+     * Когда оно становится равно 0, то вызываем close() у внутреннего session.
+     */
+    private int refsCount = 1;
 
     public JpaConnectionWrapper(@NotNull final Session session) {
         this.session = session;
@@ -36,8 +37,15 @@ public class JpaConnectionWrapper implements ConnectionWrapper {
         return new JpaCallableWrapper(getSession().createStoredProcedureCall(sql));
     }
 
+    public void incRefs() {
+        this.refsCount++;
+    }
+
     @Override
     public void close() {
-        getSession().close();
+        this.refsCount--;
+        if (this.refsCount <= 0) {
+            getSession().close();
+        }
     }
 }

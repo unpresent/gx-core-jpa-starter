@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.gx.core.data.save.DbSavingOperator;
 import ru.gx.core.jpa.save.JpaBinaryDbSavingOperator;
 import ru.gx.core.jpa.save.JpaDbSaver;
 import ru.gx.core.jpa.save.JpaJsonDbSavingOperator;
@@ -30,8 +29,8 @@ public class CommonAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnProperty(
-            value = "service.db-saving.operator.type",
-            havingValue = "json"
+            value = "service.db-saving.jpa-json-operator.enabled",
+            havingValue = "true"
     )
     public JpaJsonDbSavingOperator jpaJsonDbSavingOperator(
             @NotNull final ObjectMapper objectMapper,
@@ -43,8 +42,8 @@ public class CommonAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnProperty(
-            value = "service.db-saving.operator.type",
-            havingValue = "binary"
+            value = "service.db-saving.jpa-binary-operator.enabled",
+            havingValue = "true"
     )
     public JpaBinaryDbSavingOperator jpaBinaryDbSavingOperator(
             @NotNull final ObjectMapper objectMapper,

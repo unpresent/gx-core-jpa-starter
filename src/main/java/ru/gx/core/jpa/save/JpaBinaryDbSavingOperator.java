@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import org.hibernate.Session;
 import org.hibernate.procedure.ProcedureCall;
 import org.jetbrains.annotations.NotNull;
 import ru.gx.core.data.save.AbstractBinaryDbSavingOperator;
@@ -32,9 +33,9 @@ public class JpaBinaryDbSavingOperator
     public @NotNull ProcedureCall prepareStatement(
             @NotNull final String sqlCommand,
             @NotNull final DbSavingAccumulateMode accumulateMode
-    ) throws SQLException {
-        var session = getThreadConnectionsWrapper().getCurrent();
-        return session.getNamedProcedureCall(sqlCommand);
+    ) {
+        var session = getThreadConnectionsWrapper().getCurrentThreadConnection();
+        return ((Session)session.getInternalConnection()).getNamedProcedureCall(sqlCommand);
     }
 
     @Override

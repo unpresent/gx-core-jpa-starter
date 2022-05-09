@@ -13,7 +13,10 @@ public class ConfigurationPropertiesService {
     private JpaSaver jpaSaver;
 
     @NestedConfigurationProperty
-    private Operator operator;
+    private Operator jpaJsonOperator;
+
+    @NestedConfigurationProperty
+    private Operator jpaBinaryOperator;
 
     @Getter
     @Setter
@@ -24,12 +27,6 @@ public class ConfigurationPropertiesService {
     @Getter
     @Setter
     public static class Operator {
-        public OperatorType operatorType = OperatorType.Json;
-    }
-
-    @SuppressWarnings("unused")
-    public enum OperatorType {
-        Json,
-        Binary
+        public boolean enabled = true;
     }
 }
