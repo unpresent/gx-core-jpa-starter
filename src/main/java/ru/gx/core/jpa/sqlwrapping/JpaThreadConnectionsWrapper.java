@@ -38,7 +38,7 @@ public class JpaThreadConnectionsWrapper implements ThreadConnectionsWrapper {
         if (result != null) {
             result.incRefs();
         } else {
-            result = new JpaConnectionWrapper(this.sessionFactory.getCurrentSession());
+            result = new JpaConnectionWrapper(this.sessionFactory.openSession());
             internalPut(Thread.currentThread(), result);
         }
         return result;
