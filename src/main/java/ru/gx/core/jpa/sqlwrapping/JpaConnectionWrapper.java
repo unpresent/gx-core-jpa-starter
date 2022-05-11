@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import ru.gx.core.data.sqlwrapping.ConnectionWrapper;
 import ru.gx.core.data.sqlwrapping.SqlCommandWrapper;
 
+import java.sql.SQLException;
+
 public class JpaConnectionWrapper implements ConnectionWrapper {
     @Getter(AccessLevel.PROTECTED)
     @NotNull
@@ -35,6 +37,21 @@ public class JpaConnectionWrapper implements ConnectionWrapper {
     @Override
     public @NotNull SqlCommandWrapper getCallable(@NotNull String sql) {
         return new JpaCallableWrapper(getSession().createStoredProcedureCall(sql));
+    }
+
+    @Override
+    public void openTransaction() {
+        getSession().beginTransaction();
+    }
+
+    @Override
+    public void commitTransaction() {
+        getSession().getTransaction().commit();
+    }
+
+    @Override
+    public void rollbackTransaction() {
+        getSession().getTransaction().commit();
     }
 
     public void incRefs() {

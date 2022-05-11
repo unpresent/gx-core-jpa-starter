@@ -17,6 +17,7 @@ import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
 
+@SuppressWarnings("ClassCanBeRecord")
 public class JpaQueryWrapper implements SqlCommandWrapper {
     @Getter(PROTECTED)
     @NotNull

@@ -11,8 +11,6 @@ import ru.gx.core.data.save.AbstractBinaryDbSavingOperator;
 import ru.gx.core.data.save.DbSavingAccumulateMode;
 import ru.gx.core.jpa.sqlwrapping.JpaThreadConnectionsWrapper;
 
-import java.sql.SQLException;
-
 @Accessors(chain = true)
 public class JpaBinaryDbSavingOperator
         extends AbstractBinaryDbSavingOperator {

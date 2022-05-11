@@ -31,22 +31,22 @@ public class JpaCallableWrapper implements SqlCommandWrapper {
     }
 
     @Override
-    public void setStringParam(int paramIndex, @Nullable String value) throws SQLException {
+    public void setStringParam(int paramIndex, @Nullable String value) {
         getProcedureCall().setParameter(paramIndex, value);
     }
 
     @Override
-    public void setIntegerParam(int paramIndex, @Nullable Integer value) throws SQLException {
+    public void setIntegerParam(int paramIndex, @Nullable Integer value) {
         getProcedureCall().setParameter(paramIndex, value);
     }
 
     @Override
-    public void setLongParam(int paramIndex, @Nullable Long value) throws SQLException {
+    public void setLongParam(int paramIndex, @Nullable Long value) {
         getProcedureCall().setParameter(paramIndex, value);
     }
 
     @Override
-    public void setNumericParam(int paramIndex, @Nullable BigDecimal value)  throws SQLException {
+    public void setNumericParam(int paramIndex, @Nullable BigDecimal value) {
         getProcedureCall().setParameter(paramIndex, value);
     }
 
