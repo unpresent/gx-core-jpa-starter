@@ -2,6 +2,7 @@ package ru.gx.core.jpa.sqlwrapping;
 
 import lombok.Getter;
 import org.hibernate.procedure.ProcedureCall;
+import org.hibernate.query.NativeQuery;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.gx.core.data.sqlwrapping.ResultWrapper;
@@ -19,46 +20,73 @@ import static lombok.AccessLevel.PROTECTED;
 public class JpaCallableWrapper implements SqlCommandWrapper {
     @Getter(PROTECTED)
     @NotNull
-    private final ProcedureCall procedureCall;
+    private final NativeQuery<?> nativeQuery;
 
-    public JpaCallableWrapper(@NotNull final ProcedureCall procedureCall) {
-        this.procedureCall = procedureCall;
+    @Getter
+    @NotNull
+    private final JpaConnectionWrapper connection;
+
+    public JpaCallableWrapper(
+            @NotNull final NativeQuery<?> nativeQuery,
+            @NotNull final JpaConnectionWrapper connection
+    ) {
+        this.nativeQuery = nativeQuery;
+        this.connection = connection;
     }
 
     @Override
     public @NotNull Object getInternalCommand() {
-        return getProcedureCall();
+        return getNativeQuery();
     }
 
     @Override
     public void setStringParam(int paramIndex, @Nullable String value) {
-        getProcedureCall().setParameter(paramIndex, value);
+        getNativeQuery().setParameter(paramIndex, value);
     }
 
     @Override
     public void setIntegerParam(int paramIndex, @Nullable Integer value) {
-        getProcedureCall().setParameter(paramIndex, value);
+        getNativeQuery().setParameter(paramIndex, value);
     }
 
     @Override
     public void setLongParam(int paramIndex, @Nullable Long value) {
-        getProcedureCall().setParameter(paramIndex, value);
+        getNativeQuery().setParameter(paramIndex, value);
     }
 
     @Override
     public void setNumericParam(int paramIndex, @Nullable BigDecimal value) {
-        getProcedureCall().setParameter(paramIndex, value);
+        getNativeQuery().setParameter(paramIndex, value);
+    }
+
+    @Override
+    public void setBinaryParam(int paramIndex, byte[] value) {
+        getNativeQuery().setParameter(paramIndex, value);
     }
 
     @Override
     public void executeNoResult() {
-        getProcedureCall().execute();
+        var localTranOpened = false;
+        if (!this.connection.isTransactionOpened()) {
+            getConnection().openTransaction();
+            localTranOpened = true;
+        }
+        try {
+            getNativeQuery().executeUpdate();
+            if (localTranOpened) {
+                getConnection().commitTransaction();
+            }
+        } catch (Exception e) {
+            if (localTranOpened) {
+                getConnection().rollbackTransaction();
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public ResultWrapper executeWithResult() {
-        return new JpaResultWrapper(getProcedureCall().getResultList());
+        return new JpaResultWrapper((List<Object[]>) getNativeQuery().getResultList());
     }
 
     @Override

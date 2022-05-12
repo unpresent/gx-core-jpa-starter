@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.gx.core.data.sqlwrapping.ResultWrapper;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -21,7 +22,7 @@ public class JpaResultWrapper implements ResultWrapper {
 
     public JpaResultWrapper(@NotNull final List<Object[]> resultSet) {
         this.resultSet = resultSet;
-        this.currentIndex = 0;
+        this.currentIndex = -1;
     }
 
     @Override
@@ -31,11 +32,12 @@ public class JpaResultWrapper implements ResultWrapper {
 
     @Override
     public boolean next() {
-        if (currentIndex < this.resultSet.size()) {
-            currentIndex++;
-            return true;
+        currentIndex++;
+        if (currentIndex > this.resultSet.size()) {
+            currentIndex = this.resultSet.size();
+            return false;
         }
-        return false;
+        return currentIndex < this.resultSet.size();
     }
 
     @Override
@@ -57,21 +59,31 @@ public class JpaResultWrapper implements ResultWrapper {
 
     @Override
     public @Nullable String getString(int columnIndex) {
-        return (String) (getResultSet().get(currentIndex)[columnIndex]);
+        return (String) (getResultSet().get(currentIndex)[columnIndex-1]);
     }
 
     @Override
     public @Nullable Integer getInteger(int columnIndex) {
-        return (Integer) (getResultSet().get(currentIndex)[columnIndex]);
+        return (Integer) (getResultSet().get(currentIndex)[columnIndex-1]);
     }
 
     @Override
     public @Nullable Long getLong(int columnIndex) {
-        return (Long) (getResultSet().get(currentIndex)[columnIndex]);
+        final var value = (getResultSet().get(currentIndex)[columnIndex-1]);
+        if (value == null) {
+            throw new NullPointerException("Unable cast null to Long for column " + columnIndex + "!");
+        }
+        if (value instanceof final BigInteger bigInteger) {
+            return bigInteger.longValue();
+        } else if (value instanceof final Integer integer) {
+            return (long)integer;
+        } else {
+            throw new ClassCastException("Unable cast value " + value + " to Long for column " + columnIndex + "!");
+        }
     }
 
     @Override
     public @Nullable BigDecimal getNumeric(int columnIndex) {
-        return (BigDecimal) (getResultSet().get(currentIndex)[columnIndex]);
+        return (BigDecimal) (getResultSet().get(currentIndex)[columnIndex-1]);
     }
 }

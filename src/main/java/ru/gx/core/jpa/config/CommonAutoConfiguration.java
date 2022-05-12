@@ -8,10 +8,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.gx.core.data.save.DbSavingConfiguration;
 import ru.gx.core.jpa.save.JpaBinaryDbSavingOperator;
 import ru.gx.core.jpa.save.JpaDbSaver;
 import ru.gx.core.jpa.save.JpaJsonDbSavingOperator;
 import ru.gx.core.jpa.sqlwrapping.JpaThreadConnectionsWrapper;
+
+import java.util.List;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Configuration
@@ -58,7 +61,9 @@ public class CommonAutoConfiguration {
             value = "service.db-saving.jpa-saver.enabled",
             havingValue = "true"
     )
-    public JpaDbSaver jdbcDbSaver() {
-        return new JpaDbSaver();
+    public JpaDbSaver jdbcDbSaver(
+            @NotNull final List<DbSavingConfiguration> configurations
+    ) {
+        return new JpaDbSaver(configurations);
     }
 }

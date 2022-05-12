@@ -23,8 +23,16 @@ public class JpaQueryWrapper implements SqlCommandWrapper {
     @NotNull
     private final NativeQuery<?> nativeQuery;
 
-    public JpaQueryWrapper(@NotNull final NativeQuery<?> nativeQuery) {
+    @Getter
+    @NotNull
+    private final JpaConnectionWrapper connection;
+
+    public JpaQueryWrapper(
+            @NotNull final NativeQuery<?> nativeQuery,
+            @NotNull final JpaConnectionWrapper connection
+    ) {
         this.nativeQuery = nativeQuery;
+        this.connection = connection;
     }
 
     @Override
@@ -53,8 +61,27 @@ public class JpaQueryWrapper implements SqlCommandWrapper {
     }
 
     @Override
+    public void setBinaryParam(int paramIndex, byte[] value) {
+        getNativeQuery().setParameter(paramIndex, value);
+    }
+
+    @Override
     public void executeNoResult() {
-        getNativeQuery().executeUpdate();
+        var localTranOpened = false;
+        if (!this.connection.isTransactionOpened()) {
+            getConnection().openTransaction();
+            localTranOpened = true;
+        }
+        try {
+            getNativeQuery().executeUpdate();
+            if (localTranOpened) {
+                getConnection().commitTransaction();
+            }
+        } catch (Exception e) {
+            if (localTranOpened) {
+                getConnection().rollbackTransaction();
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

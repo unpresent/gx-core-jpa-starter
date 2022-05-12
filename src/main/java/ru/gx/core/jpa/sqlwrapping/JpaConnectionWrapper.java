@@ -9,8 +9,15 @@ import ru.gx.core.data.sqlwrapping.SqlCommandWrapper;
 
 import java.sql.SQLException;
 
+import static lombok.AccessLevel.PROTECTED;
+
 public class JpaConnectionWrapper implements ConnectionWrapper {
-    @Getter(AccessLevel.PROTECTED)
+
+    @Getter
+    @NotNull
+    private final JpaThreadConnectionsWrapper owner;
+
+    @Getter(PROTECTED)
     @NotNull
     private final Session session;
 
@@ -20,7 +27,11 @@ public class JpaConnectionWrapper implements ConnectionWrapper {
      */
     private int refsCount = 1;
 
-    public JpaConnectionWrapper(@NotNull final Session session) {
+    public JpaConnectionWrapper(
+            @NotNull final JpaThreadConnectionsWrapper owner,
+            @NotNull final Session session
+    ) {
+        this.owner = owner;
         this.session = session;
     }
 
@@ -31,12 +42,12 @@ public class JpaConnectionWrapper implements ConnectionWrapper {
 
     @Override
     public @NotNull SqlCommandWrapper getQuery(@NotNull final String sql) {
-        return new JpaQueryWrapper(getSession().getNamedNativeQuery(sql));
+        return new JpaQueryWrapper(getSession().createNativeQuery(sql), this);
     }
 
     @Override
     public @NotNull SqlCommandWrapper getCallable(@NotNull String sql) {
-        return new JpaCallableWrapper(getSession().createStoredProcedureCall(sql));
+        return new JpaCallableWrapper(getSession().createNativeQuery(sql), this);
     }
 
     @Override
@@ -51,7 +62,12 @@ public class JpaConnectionWrapper implements ConnectionWrapper {
 
     @Override
     public void rollbackTransaction() {
-        getSession().getTransaction().commit();
+        getSession().getTransaction().rollback();
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean isTransactionOpened() {
+        return getSession().getTransaction() != null;
     }
 
     public void incRefs() {
@@ -62,6 +78,7 @@ public class JpaConnectionWrapper implements ConnectionWrapper {
     public void close() {
         this.refsCount--;
         if (this.refsCount <= 0) {
+            getOwner().internalRemove(Thread.currentThread(), this);
             getSession().close();
         }
     }
