@@ -81,6 +81,7 @@ public class JpaQueryWrapper implements SqlCommandWrapper {
             if (localTranOpened) {
                 getConnection().rollbackTransaction();
             }
+            throw e;
         }
     }
 

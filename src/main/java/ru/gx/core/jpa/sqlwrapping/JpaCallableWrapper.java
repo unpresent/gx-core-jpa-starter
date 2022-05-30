@@ -80,6 +80,7 @@ public class JpaCallableWrapper implements SqlCommandWrapper {
             if (localTranOpened) {
                 getConnection().rollbackTransaction();
             }
+            throw e;
         }
     }
 
