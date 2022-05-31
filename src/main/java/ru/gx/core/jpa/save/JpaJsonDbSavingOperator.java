@@ -41,11 +41,10 @@ public class JpaJsonDbSavingOperator
 
     @Override
     protected void executeStatement(
-            @NotNull final Object statement,
+            @NotNull final SqlCommandWrapper statement,
             @NotNull final Object data
     ) throws SQLException {
-        final var stmt = (SqlCommandWrapper)statement;
-        stmt.setStringParam(1, (String)data);
-        stmt.executeNoResult();
+        statement.setStringParam(1, (String)data);
+        statement.executeNoResult();
     }
 }

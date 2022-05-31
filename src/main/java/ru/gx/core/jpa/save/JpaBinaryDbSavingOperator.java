@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import org.hibernate.Session;
-import org.hibernate.procedure.ProcedureCall;
 import org.jetbrains.annotations.NotNull;
 import ru.gx.core.data.save.AbstractBinaryDbSavingOperator;
 import ru.gx.core.data.save.DbSavingAccumulateMode;
@@ -41,11 +39,10 @@ public class JpaBinaryDbSavingOperator
 
     @Override
     protected void executeStatement(
-            @NotNull final Object statement,
+            @NotNull final SqlCommandWrapper statement,
             @NotNull final Object data
     ) throws SQLException {
-        final var stmt = (SqlCommandWrapper)statement;
-        stmt.setBinaryParam(1, (byte[])data);
-        stmt.executeNoResult();
+        statement.setBinaryParam(1, (byte[])data);
+        statement.executeNoResult();
     }
 }

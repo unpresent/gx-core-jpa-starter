@@ -3,7 +3,10 @@ package ru.gx.core.jpa.sqlwrapping;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.TransactionException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.gx.core.data.sqlwrapping.ConnectionWrapper;
 import ru.gx.core.data.sqlwrapping.SqlCommandWrapper;
 
@@ -20,6 +23,9 @@ public class JpaConnectionWrapper implements ConnectionWrapper {
     @Getter(PROTECTED)
     @NotNull
     private final Session session;
+
+    @Nullable
+    private Transaction transaction;
 
     /**
      * Определяет количество использований данного объекта.
@@ -52,22 +58,30 @@ public class JpaConnectionWrapper implements ConnectionWrapper {
 
     @Override
     public void openTransaction() {
-        getSession().beginTransaction();
+        this.transaction = getSession().beginTransaction();
     }
 
     @Override
     public void commitTransaction() {
-        getSession().getTransaction().commit();
+        if (this.transaction == null) {
+            throw new TransactionException("Transaction is not opened!");
+        }
+        this.transaction.commit();
+        this.transaction = null;
     }
 
     @Override
     public void rollbackTransaction() {
-        getSession().getTransaction().rollback();
+        if (this.transaction == null) {
+            throw new TransactionException("Transaction is not opened!");
+        }
+        this.transaction.rollback();
+        this.transaction = null;
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isTransactionOpened() {
-        return getSession().getTransaction() != null;
+        return this.transaction != null && this.transaction.isActive();
     }
 
     public void incRefs() {
@@ -81,5 +95,13 @@ public class JpaConnectionWrapper implements ConnectionWrapper {
             getOwner().internalRemove(Thread.currentThread(), this);
             getSession().close();
         }
+    }
+
+    @Override
+    public boolean isEqual(@Nullable ConnectionWrapper connectionWrapper) {
+        if (connectionWrapper == null) {
+            return false;
+        }
+        return getInternalConnection().equals(connectionWrapper.getInternalConnection());
     }
 }
