@@ -1,6 +1,5 @@
 package ru.gx.core.jpa.sqlwrapping;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -9,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.gx.core.data.sqlwrapping.ConnectionWrapper;
 import ru.gx.core.data.sqlwrapping.SqlCommandWrapper;
-
-import java.sql.SQLException;
 
 import static lombok.AccessLevel.PROTECTED;
 

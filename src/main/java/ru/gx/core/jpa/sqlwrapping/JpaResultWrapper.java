@@ -7,8 +7,6 @@ import ru.gx.core.data.sqlwrapping.ResultWrapper;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -59,24 +57,24 @@ public class JpaResultWrapper implements ResultWrapper {
 
     @Override
     public @Nullable String getString(int columnIndex) {
-        return (String) (getResultSet().get(currentIndex)[columnIndex-1]);
+        return (String) (getResultSet().get(currentIndex)[columnIndex - 1]);
     }
 
     @Override
     public @Nullable Integer getInteger(int columnIndex) {
-        return (Integer) (getResultSet().get(currentIndex)[columnIndex-1]);
+        return (Integer) (getResultSet().get(currentIndex)[columnIndex - 1]);
     }
 
     @Override
     public @Nullable Long getLong(int columnIndex) {
-        final var value = (getResultSet().get(currentIndex)[columnIndex-1]);
+        final var value = (getResultSet().get(currentIndex)[columnIndex - 1]);
         if (value == null) {
             throw new NullPointerException("Unable cast null to Long for column " + columnIndex + "!");
         }
         if (value instanceof final BigInteger bigInteger) {
             return bigInteger.longValue();
         } else if (value instanceof final Integer integer) {
-            return (long)integer;
+            return (long) integer;
         } else {
             throw new ClassCastException("Unable cast value " + value + " to Long for column " + columnIndex + "!");
         }
@@ -84,6 +82,6 @@ public class JpaResultWrapper implements ResultWrapper {
 
     @Override
     public @Nullable BigDecimal getNumeric(int columnIndex) {
-        return (BigDecimal) (getResultSet().get(currentIndex)[columnIndex-1]);
+        return (BigDecimal) (getResultSet().get(currentIndex)[columnIndex - 1]);
     }
 }

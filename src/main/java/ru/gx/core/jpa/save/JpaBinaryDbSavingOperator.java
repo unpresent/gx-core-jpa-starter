@@ -42,7 +42,7 @@ public class JpaBinaryDbSavingOperator
             @NotNull final SqlCommandWrapper statement,
             @NotNull final Object data
     ) throws SQLException {
-        statement.setBinaryParam(1, (byte[])data);
+        statement.setBinaryParam(1, (byte[]) data);
         statement.executeNoResult();
     }
 }

@@ -1,18 +1,13 @@
 package ru.gx.core.jpa.sqlwrapping;
 
 import lombok.Getter;
-import org.hibernate.procedure.ProcedureCall;
 import org.hibernate.query.NativeQuery;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.gx.core.data.sqlwrapping.ResultWrapper;
 import ru.gx.core.data.sqlwrapping.SqlCommandWrapper;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.CallableStatement;
-import java.sql.SQLException;
-import java.sql.Types;
 import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;

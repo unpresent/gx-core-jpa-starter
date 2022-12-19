@@ -3,8 +3,6 @@ package ru.gx.core.jpa.save;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import org.hibernate.Session;
-import org.hibernate.procedure.ProcedureCall;
 import org.jetbrains.annotations.NotNull;
 import ru.gx.core.data.save.AbstractJsonDbSavingOperator;
 import ru.gx.core.data.save.DbSavingAccumulateMode;
@@ -12,7 +10,6 @@ import ru.gx.core.data.sqlwrapping.SqlCommandWrapper;
 import ru.gx.core.jpa.sqlwrapping.JpaThreadConnectionsWrapper;
 
 import java.sql.SQLException;
-
 
 @Accessors(chain = true)
 public class JpaJsonDbSavingOperator
@@ -44,7 +41,7 @@ public class JpaJsonDbSavingOperator
             @NotNull final SqlCommandWrapper statement,
             @NotNull final Object data
     ) throws SQLException {
-        statement.setStringParam(1, (String)data);
+        statement.setStringParam(1, (String) data);
         statement.executeNoResult();
     }
 }
